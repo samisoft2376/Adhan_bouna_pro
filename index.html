@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>أذان بونة Pro - Kherrachi Sami</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#004d40">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --teal-deep: #004d40; --main-teal: #00695c; --accent-gold: #ffcf33;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --bg-gradient: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #004d40);
+            --metallic-gold: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif; margin: 0; display: flex;
+            justify-content: center; align-items: center; min-height: 100vh;
+            background: var(--bg-gradient); background-size: 400% 400%;
+            animation: gradientMove 15s ease infinite; padding: 15px;
+        }
+
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .app-container {
+            width: 100%; max-width: 400px; background: var(--glass-bg);
+            border-radius: 40px; box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.4); text-align: center;
+        }
+
+        header { background: linear-gradient(to bottom, var(--teal-deep), var(--main-teal)); color: white; padding: 25px 15px; position: relative; }
+        
+        .settings-btn { position: absolute; top: 20px; left: 20px; font-size: 1.5rem; cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+
+        .premium-frame { background: rgba(0, 0, 0, 0.25); border-radius: 25px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.15); margin-top: 15px; }
+        .brand-logo { width: 45px; height: 45px; background: var(--metallic-gold); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.5rem; margin-bottom: 10px; }
+        .live-clock { font-size: 2.5rem; font-weight: bold; margin: 5px 0; }
+        #timer { font-size: 1.2rem; font-weight: bold; color: var(--accent-gold); }
+
+        .dua-container { padding: 20px; min-height: 80px; display: flex; align-items: center; justify-content: center; color: var(--teal-deep); font-weight: 600; font-style: italic; border-bottom: 1px solid #eee; }
+
+        .prayer-list { padding: 15px; }
+        .prayer-card { display: flex; justify-content: space-between; padding: 12px 20px; margin-bottom: 8px; border-radius: 15px; background: #f9f9f9; transition: 0.3s; }
+        .prayer-card.active { background: var(--teal-deep); color: white !important; transform: scale(1.03); }
+        .p-time { font-weight: bold; color: var(--teal-deep); }
+        .prayer-card.active .p-time { color: white; }
+
+        .btn-activate { width: 80%; padding: 12px; border-radius: 25px; border: none; background: var(--teal-deep); color: white; font-weight: bold; margin-bottom: 20px; cursor: pointer; }
+
+        /* Modal Settings */
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display:none; justify-content:center; align-items:center; z-index:1000; }
+        .modal-content { width:85%; max-width:350px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 25px; padding: 25px; color: white; }
+        .setting-item { display:flex; justify-content:space-between; margin-bottom: 15px; align-items: center; }
+        .close-modal { color: var(--accent-gold); cursor:pointer; font-weight:bold; }
+    </style>
+</head>
+<body>
+
+    <main class="app-container">
+        <header>
+            <div class="settings-btn" onclick="toggleModal()">⚙️</div>
+            <div class="premium-frame">
+                <div class="brand-logo">K</div>
+                <div style="font-family: 'Playfair Display';">Oroko Shikaku</div>
+                <div class="live-clock" id="liveClock">00:00:00</div>
+                <div id="timer-label">الصلاة القادمة بعد</div>
+                <div id="timer">--:--:--</div>
+            </div>
+        </header>
+
+        <div class="dua-container" id="dua-box"><span id="dua-text">أستغفر الله العظيم</span></div>
+
+        <section class="prayer-list">
+            <div class="prayer-card" id="Fajr"><span>الفجر</span><span class="p-time" id="t-Fajr">--:--</span></div>
+            <div class="prayer-card" id="Dhuhr"><span>الظهر</span><span class="p-time" id="t-Dhuhr">--:--</span></div>
+            <div class="prayer-card" id="Asr"><span>العصر</span><span class="p-time" id="t-Asr">--:--</span></div>
+            <div class="prayer-card" id="Maghrib"><span>المغرب</span><span class="p-time" id="t-Maghrib">--:--</span></div>
+            <div class="prayer-card" id="Isha"><span>العشاء</span><span class="p-time" id="t-Isha">--:--</span></div>
+        </section>
+
+        <button class="btn-activate" id="p-btn" onclick="activateAdhan()">🔔 تفعيل الأذان</button>
+    </main>
+
+    <div class="modal" id="s-modal">
+        <div class="modal-content">
+            <h3 style="color:var(--accent-gold)">إعدادات الأذان 🌙</h3>
+            <div class="setting-item"><span>صوت الأذان</span>
+                <select id="a-select" style="background:transparent; color:white; border:1px solid #555; padding:5px; border-radius:5px;">
+                    <option value="adhan.mp3">مكة المكرمة</option>
+                </select>
+            </div>
+            <div class="setting-item"><span>مستوى الصوت</span><input type="range" id="v-slider" min="0" max="1" step="0.1" value="1"></div>
+            <div class="close-modal" onclick="toggleModal()">إغلاق التعديلات ✖️</div>
+        </div>
+    </div>
+
+    <audio id="a-player" src="adhan.mp3"></audio>
+
+    <script>
+        const prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+        const duas = ["سبحان الله وبحمده", "اللهم صلِّ على محمد", "أستغفر الله واتوب إليه", "لا إله إلا الله"];
+        let pTimes = {};
+
+        function toggleModal() { const m = document.getElementById('s-modal'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
+        function activateAdhan() { document.getElementById('a-player').muted = false; document.getElementById('p-btn').innerText = "✅ الأذان مُفعل"; }
+
+        async function getTimes() {
+            const res = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Annaba&country=Algeria&method=3');
+            const d = await res.json();
+            pTimes = d.data.timings;
+            prayers.forEach(p => document.getElementById(`t-${p}`).innerText = pTimes[p]);
+        }
+
+        function update() {
+            const now = new Date();
+            document.getElementById('liveClock').innerText = now.toLocaleTimeString('ar-DZ');
+            let next = null; let min = Infinity;
+            prayers.forEach(p => {
+                const [h, m] = pTimes[p] ? pTimes[p].split(':') : [0,0];
+                const pd = new Date(); pd.setHours(h, m, 0);
+                if (pd > now && (pd - now) < min) { min = pd - now; next = p; }
+                document.getElementById(p).classList.remove('active');
+            });
+            if (next) {
+                document.getElementById(next).classList.add('active');
+                const diff = new Date(min);
+                document.getElementById('timer').innerText = `${String(Math.floor(min/3600000)).padStart(2,'0')}:${String(Math.floor((min%3600000)/60000)).padStart(2,'0')}:${String(Math.floor((min%60000)/1000)).padStart(2,'0')}`;
+                if (min < 1000) document.getElementById('a-player').play();
+            }
+        }
+
+        setInterval(() => { document.getElementById('dua-text').innerText = duas[Math.floor(Math.random()*duas.length)]; }, 10000);
+        getTimes().then(() => setInterval(update, 1000));
+        
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
+    </script>
+</body>
+</html>
